@@ -89,4 +89,11 @@ public class TransactionService {
     }
 
 
+    public void transferBetweenAccounts(String fromAccountNumber, String toAccountNumber, BigDecimal amount) throws AccountNotFoundException, AmountNegativeException, MinimumAmountException {
+            withdrawal(fromAccountNumber, amount);
+            deposit(toAccountNumber, amount);
+    }
+
+
+
 }
