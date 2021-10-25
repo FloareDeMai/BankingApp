@@ -2,13 +2,12 @@ package com.florentina.bankingapplication.transaction;
 
 
 import com.florentina.bankingapplication.account.Account;
-import com.florentina.bankingapplication.account.AccountService;
 import com.florentina.bankingapplication.exception.domain.AccountNotFoundException;
 import com.florentina.bankingapplication.exception.domain.AmountNegativeException;
 import com.florentina.bankingapplication.exception.domain.MinimumAmountException;
 import com.florentina.bankingapplication.payload.request.TransactionRequest;
+import com.florentina.bankingapplication.payload.response.TransferResponse;
 import lombok.AllArgsConstructor;
-import lombok.Getter;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -43,8 +42,9 @@ public class TransactionController {
     }
 
     @PostMapping("/transfer/{fromAccount}/{toAccount}/{amount}")
-    public void transfer(@PathVariable String fromAccount, @PathVariable String toAccount, @PathVariable BigDecimal amount) throws AccountNotFoundException, AmountNegativeException, MinimumAmountException {
-        transactionService.transferBetweenAccounts(fromAccount, toAccount, amount);
+    public TransferResponse transfer(@PathVariable String fromAccount, @PathVariable String toAccount, @PathVariable BigDecimal amount) throws AccountNotFoundException, AmountNegativeException, MinimumAmountException {
+      return transactionService.transferBetweenAccounts(fromAccount, toAccount, amount);
+
     }
 
 

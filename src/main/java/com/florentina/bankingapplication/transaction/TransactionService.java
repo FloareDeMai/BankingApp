@@ -6,6 +6,7 @@ import com.florentina.bankingapplication.enums.TransactionType;
 import com.florentina.bankingapplication.exception.domain.AccountNotFoundException;
 import com.florentina.bankingapplication.exception.domain.AmountNegativeException;
 import com.florentina.bankingapplication.exception.domain.MinimumAmountException;
+import com.florentina.bankingapplication.payload.response.TransferResponse;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -77,7 +78,7 @@ public class TransactionService {
 
         BigDecimal currentBalance = account.getCurrentBalance();
 
-        if(!(currentBalance.compareTo(amount) >= 0)){
+        if (!(currentBalance.compareTo(amount) >= 0)) {
             throw new AmountNegativeException("Insufficient funds! Your current balance is: " + account.getCurrentBalance());
         }
         Transaction transaction = new Transaction();
@@ -93,12 +94,17 @@ public class TransactionService {
     }
 
 
-    public void transferBetweenAccounts(String fromAccountNumber, String toAccountNumber, BigDecimal amount) throws AccountNotFoundException, AmountNegativeException, MinimumAmountException {
-            withdrawal(fromAccountNumber, amount);
-            deposit(toAccountNumber, amount);
+    public TransferResponse transferBetweenAccounts(String fromAccountNumber, String toAccountNumber, BigDecimal amount) throws AccountNotFoundException, AmountNegativeException, MinimumAmountException {
+        withdrawal(fromAccountNumber, amount);
+        deposit(toAccountNumber, amount);
+        return TransferResponse.builder()
+                .amount(amount)
+                .fromAccount(fromAccountNumber)
+                .toAccount(toAccountNumber)
+                .build();
     }
 
-    public TransactionDto covertTransactionToTransactionDto(Transaction transaction){
+    public TransactionDto covertTransactionToTransactionDto(Transaction transaction) {
         return TransactionDto.builder()
                 .accountNumber(transaction.getAccount().getAccountNumber())
                 .amount(transaction.getAmount())
