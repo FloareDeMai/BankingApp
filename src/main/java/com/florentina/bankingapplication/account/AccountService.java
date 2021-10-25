@@ -6,6 +6,7 @@ import com.florentina.bankingapplication.exception.domain.AccountNotFoundExcepti
 import com.florentina.bankingapplication.exception.domain.AmountNegativeException;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 
@@ -28,9 +29,9 @@ public class AccountService {
         // check balance
         if(formAccount.getCurrentBalance()==null){
             account.setCurrentBalance(new BigDecimal(0));
-        }else if ((formAccount.getCurrentBalance()).compareTo(new BigDecimal(0))< 0){
+        }else if ((formAccount.getCurrentBalance()).compareTo(BigDecimal.ZERO)< 0){
             throw new AmountNegativeException("Balance must be positive");
-        }else if((formAccount.getCurrentBalance()).compareTo(new BigDecimal(0)) >= 0){
+        }else if((formAccount.getCurrentBalance()).compareTo(BigDecimal.ZERO) >= 0){
             account.setCurrentBalance(formAccount.getCurrentBalance());
         }
 
@@ -38,6 +39,7 @@ public class AccountService {
         return account;
     }
 
+    @Transactional
     public BigDecimal getBalanceByAccountNumber(String accountNumber) throws AccountNotFoundException {
         Account account = accountRepository.getAccountByAccountNumber(accountNumber);
         if(account == null){

@@ -22,6 +22,7 @@ public class Account {
     @Id
     @GeneratedValue
     private Long id;
+    // de facut gen iban din uuid
     private String accountNumber;
     private BigDecimal currentBalance;
     @OneToMany(mappedBy = "account", cascade = CascadeType.ALL)

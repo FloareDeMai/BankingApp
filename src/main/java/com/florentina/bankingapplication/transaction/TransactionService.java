@@ -19,7 +19,6 @@ import java.util.Optional;
 
 @AllArgsConstructor
 @Service
-@Transactional
 @Slf4j
 public class TransactionService {
 
@@ -40,14 +39,15 @@ public class TransactionService {
     }
 
 
-    public Account deposit(String numberAccount, BigDecimal amount) throws AccountNotFoundException, AmountNegativeException, MinimumAmountException {
+    @Transactional
+    public  Account deposit(String numberAccount, BigDecimal amount) throws AccountNotFoundException, AmountNegativeException, MinimumAmountException {
         Account account = accountRepository.getAccountByAccountNumber(numberAccount);
 
         if (account == null) {
             throw new AccountNotFoundException("There is no account found with this number!");
         }
 
-        if (amount.compareTo(new BigDecimal(0)) < 0) {
+        if (amount.compareTo(BigDecimal.ZERO) < 0) {
             throw new AmountNegativeException("Amount must be positive!");
         }
 
@@ -56,8 +56,9 @@ public class TransactionService {
         }
         Transaction transaction = new Transaction();
         transaction.setBalanceBefore(account.getCurrentBalance());
+
         account.setCurrentBalance((account.getCurrentBalance()).add(amount));
-        accountRepository.save(account);
+
         transaction.setAmount(amount);
         transaction.setBalanceAfter(account.getCurrentBalance());
         transaction.setAccount(account);
@@ -66,13 +67,14 @@ public class TransactionService {
         return account;
     }
 
-    public Account withdrawal(String numberAccount, BigDecimal amount) throws AccountNotFoundException, AmountNegativeException {
+    @Transactional
+    public  Account withdrawal(String numberAccount, BigDecimal amount) throws AccountNotFoundException, AmountNegativeException {
         Account account = accountRepository.getAccountByAccountNumber(numberAccount);
         if (account == null) {
             throw new AccountNotFoundException("There is no account found with this number!");
         }
 
-        if (amount.compareTo(new BigDecimal(0)) < 0) {
+        if (amount.compareTo(BigDecimal.ZERO) < 0) {
             throw new AmountNegativeException("Amount must be positive!");
         }
 
@@ -84,7 +86,7 @@ public class TransactionService {
         Transaction transaction = new Transaction();
         transaction.setBalanceBefore(account.getCurrentBalance());
         account.setCurrentBalance((account.getCurrentBalance()).subtract(amount));
-        accountRepository.save(account);
+
         transaction.setAmount(amount);
         transaction.setBalanceAfter(account.getCurrentBalance());
         transaction.setAccount(account);
@@ -93,8 +95,8 @@ public class TransactionService {
         return account;
     }
 
-
-    public TransferResponse transferBetweenAccounts(String fromAccountNumber, String toAccountNumber, BigDecimal amount) throws AccountNotFoundException, AmountNegativeException, MinimumAmountException {
+    @Transactional
+    public  TransferResponse transferBetweenAccounts(String fromAccountNumber, String toAccountNumber, BigDecimal amount) throws AccountNotFoundException, AmountNegativeException, MinimumAmountException {
         withdrawal(fromAccountNumber, amount);
         deposit(toAccountNumber, amount);
         return TransferResponse.builder()
@@ -104,7 +106,7 @@ public class TransactionService {
                 .build();
     }
 
-    public TransactionDto covertTransactionToTransactionDto(Transaction transaction) {
+    private TransactionDto covertTransactionToTransactionDto(Transaction transaction) {
         return TransactionDto.builder()
                 .accountNumber(transaction.getAccount().getAccountNumber())
                 .amount(transaction.getAmount())
