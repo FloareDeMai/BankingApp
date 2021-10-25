@@ -13,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @AllArgsConstructor
@@ -23,7 +24,7 @@ public class TransactionController {
   private final TransactionService transactionService;
 
     @GetMapping("/all/{accountNumber}")
-    List<Transaction> getAllTransactionsByAccountNumber(@PathVariable String accountNumber) throws AccountNotFoundException {
+    List<TransactionDto> getAllTransactionsByAccountNumber(@PathVariable String accountNumber) throws AccountNotFoundException {
         return transactionService.getAllTransactionsByAccountNumber(accountNumber);
     }
 
@@ -39,6 +40,11 @@ public class TransactionController {
     public ResponseEntity<Account> withdrawal(@RequestBody TransactionRequest transactionRequest) throws AccountNotFoundException, AmountNegativeException {
         Account account = transactionService.withdrawal(transactionRequest.getAccountNumber(), transactionRequest.getAmount());
         return new ResponseEntity<>(account, HttpStatus.OK);
+    }
+
+    @PostMapping("/transfer/{fromAccount}/{toAccount}/{amount}")
+    public void transfer(@PathVariable String fromAccount, @PathVariable String toAccount, @PathVariable BigDecimal amount) throws AccountNotFoundException, AmountNegativeException, MinimumAmountException {
+        transactionService.transferBetweenAccounts(fromAccount, toAccount, amount);
     }
 
 

@@ -12,7 +12,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @AllArgsConstructor
 @Service
@@ -24,14 +26,16 @@ public class TransactionService {
     private final AccountRepository accountRepository;
 
 
-    public List<Transaction> getAllTransactionsByAccountNumber(String accountNumber) throws AccountNotFoundException {
+    public List<TransactionDto> getAllTransactionsByAccountNumber(String accountNumber) throws AccountNotFoundException {
         Account account = accountRepository.getAccountByAccountNumber(accountNumber);
-
+        List<TransactionDto> transactionDtoList = new ArrayList<>();
         if (account == null) {
             throw new AccountNotFoundException("There is no account found with this number!");
         }
+        Optional<List<Transaction>> optionalTransactionList = transactionRepository.findByAccount(account);
+        optionalTransactionList.ifPresent(transactions -> transactions.forEach(transaction -> transactionDtoList.add(covertTransactionToTransactionDto(transaction))));
 
-        return transactionRepository.getTransactionsByAccount(account);
+        return transactionDtoList;
     }
 
 
@@ -94,6 +98,15 @@ public class TransactionService {
             deposit(toAccountNumber, amount);
     }
 
+    public TransactionDto covertTransactionToTransactionDto(Transaction transaction){
+        return TransactionDto.builder()
+                .accountNumber(transaction.getAccount().getAccountNumber())
+                .amount(transaction.getAmount())
+                .balanceBefore(transaction.getBalanceBefore())
+                .balanceAfter(transaction.getBalanceAfter())
+                .transactionType(transaction.getTransactionType())
+                .build();
+    }
 
 
 }
