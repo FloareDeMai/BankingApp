@@ -17,22 +17,18 @@ public class AccountService {
     private final AccountRepository accountRepository;
 
 
-    public Account saveNewAccount(Account formAccount) throws AmountNegativeException, AccountExistException {
-        // check if another account exists by account number
-        if(accountRepository.existsAccountByAccountNumber(formAccount.getAccountNumber())){
-            throw new AccountExistException("This account number is already taken!");
-        }
+    public Account saveNewAccount(NewAccountDto newAccountDto) throws AmountNegativeException, AccountExistException {
+
 
         Account account = new Account();
-        account.setAccountNumber(formAccount.getAccountNumber());
 
         // check balance
-        if(formAccount.getCurrentBalance()==null){
+        if(newAccountDto.getCurrentBalance()==null){
             account.setCurrentBalance(new BigDecimal(0));
-        }else if ((formAccount.getCurrentBalance()).compareTo(BigDecimal.ZERO)< 0){
+        }else if ((newAccountDto.getCurrentBalance()).compareTo(BigDecimal.ZERO)< 0){
             throw new AmountNegativeException("Balance must be positive");
-        }else if((formAccount.getCurrentBalance()).compareTo(BigDecimal.ZERO) >= 0){
-            account.setCurrentBalance(formAccount.getCurrentBalance());
+        }else if((newAccountDto.getCurrentBalance()).compareTo(BigDecimal.ZERO) >= 0){
+            account.setCurrentBalance(newAccountDto.getCurrentBalance());
         }
 
         accountRepository.save(account);

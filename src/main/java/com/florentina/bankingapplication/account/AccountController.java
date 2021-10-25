@@ -22,7 +22,7 @@ public class AccountController {
 
 
     @PostMapping("/new-account")
-    public ResponseEntity<Account> openNewAccount(@RequestBody Account account) throws AmountNegativeException, AccountExistException {
+    public ResponseEntity<Account> openNewAccount(@RequestBody NewAccountDto account) throws AmountNegativeException, AccountExistException {
         Account accountSaved = accountService.saveNewAccount(account);
         return new ResponseEntity<>(accountSaved, HttpStatus.OK);
     }
