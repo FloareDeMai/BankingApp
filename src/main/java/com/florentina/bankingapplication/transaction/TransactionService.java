@@ -10,6 +10,7 @@ import com.florentina.bankingapplication.payload.response.TransferResponse;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
@@ -39,8 +40,8 @@ public class TransactionService {
     }
 
 
-    @Transactional
-    public  Account deposit(String numberAccount, BigDecimal amount) throws AccountNotFoundException, AmountNegativeException, MinimumAmountException {
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
+    public Account deposit(String numberAccount, BigDecimal amount) throws AccountNotFoundException, AmountNegativeException, MinimumAmountException {
         Account account = accountRepository.getAccountByAccountNumber(numberAccount);
 
         if (account == null) {
@@ -67,12 +68,14 @@ public class TransactionService {
         return account;
     }
 
-    @Transactional
-    public  Account withdrawal(String numberAccount, BigDecimal amount) throws AccountNotFoundException, AmountNegativeException {
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
+    public Account withdrawal(String numberAccount, BigDecimal amount) throws AccountNotFoundException, AmountNegativeException {
         Account account = accountRepository.getAccountByAccountNumber(numberAccount);
+
         if (account == null) {
             throw new AccountNotFoundException("There is no account found with this number!");
         }
+
 
         if (amount.compareTo(BigDecimal.ZERO) < 0) {
             throw new AmountNegativeException("Amount must be positive!");
@@ -95,8 +98,8 @@ public class TransactionService {
         return account;
     }
 
-    @Transactional
-    public  TransferResponse transferBetweenAccounts(String fromAccountNumber, String toAccountNumber, BigDecimal amount) throws AccountNotFoundException, AmountNegativeException, MinimumAmountException {
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
+    public TransferResponse transferBetweenAccounts(String fromAccountNumber, String toAccountNumber, BigDecimal amount) throws AccountNotFoundException, AmountNegativeException, MinimumAmountException {
         withdrawal(fromAccountNumber, amount);
         deposit(toAccountNumber, amount);
         return TransferResponse.builder()

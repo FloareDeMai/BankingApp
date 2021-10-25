@@ -3,10 +3,8 @@ package com.florentina.bankingapplication.account;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.florentina.bankingapplication.transaction.Transaction;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
+import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
@@ -18,11 +16,12 @@ import java.util.List;
 @NoArgsConstructor
 @Getter
 @Setter
+@Builder
 public class Account {
     @Id
-    @GeneratedValue
-    private Long id;
-    // de facut gen iban din uuid
+    @GeneratedValue(generator = "system-uuid")
+    @GenericGenerator(name = "system-uuid",
+            strategy = "uuid")
     private String accountNumber;
     private BigDecimal currentBalance;
     @OneToMany(mappedBy = "account", cascade = CascadeType.ALL)
