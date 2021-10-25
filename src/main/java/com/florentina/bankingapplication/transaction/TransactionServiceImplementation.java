@@ -30,7 +30,7 @@ public class TransactionServiceImplementation implements TransactionService{
         Account account = accountRepository.getAccountByAccountNumber(accountNumber);
         List<TransactionDto> transactionDtoList = new ArrayList<>();
         if (account == null) {
-            throw new AccountNotFoundException("There is no account found with this number!");
+            throw new AccountNotFoundException("There is no account found with this number: " + accountNumber);
         }
         Optional<List<Transaction>> optionalTransactionList = transactionRepository.findByAccount(account);
         optionalTransactionList.ifPresent(transactions -> transactions.forEach(transaction -> transactionDtoList.add(covertTransactionToTransactionDto(transaction))));
@@ -44,7 +44,7 @@ public class TransactionServiceImplementation implements TransactionService{
         Account account = accountRepository.getAccountByAccountNumber(numberAccount);
 
         if (account == null) {
-            throw new AccountNotFoundException("There is no account found with this number!");
+            throw new AccountNotFoundException("There is no account found with this number: " + numberAccount);
         }
 
         if (amount.compareTo(BigDecimal.ZERO) < 0) {
@@ -72,7 +72,7 @@ public class TransactionServiceImplementation implements TransactionService{
         Account account = accountRepository.getAccountByAccountNumber(numberAccount);
 
         if (account == null) {
-            throw new AccountNotFoundException("There is no account found with this number!");
+            throw new AccountNotFoundException("There is no account found with this number: " + numberAccount);
         }
 
 

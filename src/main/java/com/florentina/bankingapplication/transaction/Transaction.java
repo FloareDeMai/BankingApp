@@ -19,7 +19,7 @@ public class Transaction {
     @GeneratedValue
     private Long id;
     @ManyToOne
-    @JoinColumn(name = "account_id")
+    @JoinColumn(name = "account_number")
     private Account account;
     private BigDecimal balanceBefore;
     private BigDecimal balanceAfter;
