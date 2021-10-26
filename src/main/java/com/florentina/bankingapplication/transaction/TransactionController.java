@@ -36,7 +36,7 @@ public class TransactionController {
 
 
     @PostMapping("/withdrawal")
-    public ResponseEntity<Account> withdrawal(@RequestBody TransactionRequest transactionRequest) throws AccountNotFoundException, AmountNegativeException {
+    public ResponseEntity<Account> withdrawal(@RequestBody TransactionRequest transactionRequest) throws AccountNotFoundException, AmountNegativeException, MinimumAmountException {
         Account account = transactionService.withdrawal(transactionRequest.getAccountNumber(), transactionRequest.getAmount());
         return new ResponseEntity<>(account, HttpStatus.OK);
     }

@@ -52,7 +52,7 @@ public class TransactionServiceImplementation implements TransactionService{
         }
 
         if (amount.compareTo(new BigDecimal(2)) < 0) {
-            throw new MinimumAmountException("Deposit should be greater than 2");
+            throw new MinimumAmountException("Deposit should be greater than 2 or equal");
         }
         Transaction transaction = new Transaction();
         transaction.setBalanceBefore(account.getCurrentBalance());
@@ -68,13 +68,16 @@ public class TransactionServiceImplementation implements TransactionService{
     }
 
     @Transactional(isolation = Isolation.REPEATABLE_READ)
-    public Account withdrawal(String numberAccount, BigDecimal amount) throws AccountNotFoundException, AmountNegativeException {
+    public Account withdrawal(String numberAccount, BigDecimal amount) throws AccountNotFoundException, AmountNegativeException, MinimumAmountException {
         Account account = accountRepository.getAccountByAccountNumber(numberAccount);
 
         if (account == null) {
             throw new AccountNotFoundException("There is no account found with this number: " + numberAccount);
         }
 
+        if(amount.compareTo(BigDecimal.ZERO) == 0 && amount.compareTo(new BigDecimal(2)) < 0){
+            throw new MinimumAmountException("Amount must be greater than 2 or equal");
+        }
 
         if (amount.compareTo(BigDecimal.ZERO) < 0) {
             throw new AmountNegativeException("Amount must be positive!");

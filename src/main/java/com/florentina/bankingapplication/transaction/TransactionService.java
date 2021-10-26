@@ -15,7 +15,7 @@ public interface TransactionService {
 
     Account deposit(String numberAccount, BigDecimal amount) throws AccountNotFoundException, AmountNegativeException, MinimumAmountException;
 
-    Account withdrawal(String numberAccount, BigDecimal amount) throws AccountNotFoundException, AmountNegativeException;
+    Account withdrawal(String numberAccount, BigDecimal amount) throws AccountNotFoundException, AmountNegativeException, MinimumAmountException;
 
     TransferResponse transferBetweenAccounts(String fromAccountNumber, String toAccountNumber, BigDecimal amount) throws AccountNotFoundException, AmountNegativeException, MinimumAmountException;
 }
