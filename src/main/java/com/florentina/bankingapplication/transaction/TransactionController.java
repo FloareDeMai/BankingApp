@@ -2,6 +2,7 @@ package com.florentina.bankingapplication.transaction;
 
 
 import com.florentina.bankingapplication.account.Account;
+import com.florentina.bankingapplication.enums.TransactionType;
 import com.florentina.bankingapplication.exception.domain.AccountNotFoundException;
 import com.florentina.bankingapplication.exception.domain.AmountNegativeException;
 import com.florentina.bankingapplication.exception.domain.MinimumAmountException;
@@ -30,14 +31,14 @@ public class TransactionController {
 
     @PostMapping("/deposit")
     public ResponseEntity<Account> deposit(@RequestBody TransactionRequest transactionRequest) throws AccountNotFoundException, AmountNegativeException, MinimumAmountException {
-        Account account = transactionService.deposit(transactionRequest.getAccountNumber(), transactionRequest.getAmount());
+        Account account = transactionService.deposit(transactionRequest.getAccountNumber(), transactionRequest.getAmount(), TransactionType.DEPOSIT);
         return new ResponseEntity<>(account, HttpStatus.OK);
     }
 
 
     @PostMapping("/withdrawal")
     public ResponseEntity<Account> withdrawal(@RequestBody TransactionRequest transactionRequest) throws AccountNotFoundException, AmountNegativeException, MinimumAmountException {
-        Account account = transactionService.withdrawal(transactionRequest.getAccountNumber(), transactionRequest.getAmount());
+        Account account = transactionService.withdrawal(transactionRequest.getAccountNumber(), transactionRequest.getAmount(), TransactionType.WITHDRAWAL);
         return new ResponseEntity<>(account, HttpStatus.OK);
     }
 

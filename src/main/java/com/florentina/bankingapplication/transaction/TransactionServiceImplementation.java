@@ -1,4 +1,5 @@
 package com.florentina.bankingapplication.transaction;
+
 import com.florentina.bankingapplication.account.Account;
 import com.florentina.bankingapplication.account.AccountRepository;
 import com.florentina.bankingapplication.enums.TransactionType;
@@ -20,7 +21,7 @@ import java.util.Optional;
 @AllArgsConstructor
 @Service
 @Slf4j
-public class TransactionServiceImplementation implements TransactionService{
+public class TransactionServiceImplementation implements TransactionService {
 
     private final TransactionRepository transactionRepository;
     private final AccountRepository accountRepository;
@@ -40,7 +41,7 @@ public class TransactionServiceImplementation implements TransactionService{
 
 
     @Transactional(isolation = Isolation.REPEATABLE_READ)
-    public Account deposit(String numberAccount, BigDecimal amount) throws AccountNotFoundException, AmountNegativeException, MinimumAmountException {
+    public Account deposit(String numberAccount, BigDecimal amount, TransactionType transactionType) throws AccountNotFoundException, AmountNegativeException, MinimumAmountException {
         Account account = accountRepository.getAccountByAccountNumber(numberAccount);
 
         if (account == null) {
@@ -62,26 +63,27 @@ public class TransactionServiceImplementation implements TransactionService{
         transaction.setAmount(amount);
         transaction.setBalanceAfter(account.getCurrentBalance());
         transaction.setAccount(account);
-        transaction.setTransactionType(TransactionType.DEPOSIT);
+        transaction.setTransactionType(transactionType);
         transactionRepository.save(transaction);
         return account;
     }
 
     @Transactional(isolation = Isolation.REPEATABLE_READ)
-    public Account withdrawal(String numberAccount, BigDecimal amount) throws AccountNotFoundException, AmountNegativeException, MinimumAmountException {
+    public Account withdrawal(String numberAccount, BigDecimal amount, TransactionType transactionType) throws AccountNotFoundException, AmountNegativeException, MinimumAmountException {
         Account account = accountRepository.getAccountByAccountNumber(numberAccount);
 
         if (account == null) {
             throw new AccountNotFoundException("There is no account found with this number: " + numberAccount);
         }
 
-        if(amount.compareTo(BigDecimal.ZERO) == 0 && amount.compareTo(new BigDecimal(2)) < 0){
-            throw new MinimumAmountException("Amount must be greater than 2 or equal");
-        }
-
         if (amount.compareTo(BigDecimal.ZERO) < 0) {
             throw new AmountNegativeException("Amount must be positive!");
         }
+
+        if (amount.compareTo(new BigDecimal(2)) < 0) {
+            throw new MinimumAmountException("Amount must be greater than 2 or equal");
+        }
+
 
         BigDecimal currentBalance = account.getCurrentBalance();
 
@@ -95,15 +97,15 @@ public class TransactionServiceImplementation implements TransactionService{
         transaction.setAmount(amount);
         transaction.setBalanceAfter(account.getCurrentBalance());
         transaction.setAccount(account);
-        transaction.setTransactionType(TransactionType.WITHDRAWAL);
+        transaction.setTransactionType(transactionType);
         transactionRepository.save(transaction);
         return account;
     }
 
     @Transactional(isolation = Isolation.REPEATABLE_READ)
     public TransferResponse transferBetweenAccounts(String fromAccountNumber, String toAccountNumber, BigDecimal amount) throws AccountNotFoundException, AmountNegativeException, MinimumAmountException {
-        withdrawal(fromAccountNumber, amount);
-        deposit(toAccountNumber, amount);
+        withdrawal(fromAccountNumber, amount, TransactionType.AMOUNT_SENT);
+        deposit(toAccountNumber, amount, TransactionType.AMOUNT_RECEIVED);
         return TransferResponse.builder()
                 .amount(amount)
                 .fromAccount(fromAccountNumber)
